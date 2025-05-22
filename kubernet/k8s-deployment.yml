@@ -1,20 +1,19 @@
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ecommerce-deploy
+  name: java-backend
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: ecommerce
+      app: java-backend
   template:
     metadata:
       labels:
-        app: ecommerce
+        app: java-backend
     spec:
       containers:
-      - name: ecommerce
-        image: wbrymo/ecommerce:v1
+      - name: java-backend
+        image: wbrymo/java-ecomm-backend:latest
         ports:
         - containerPort: 8080
