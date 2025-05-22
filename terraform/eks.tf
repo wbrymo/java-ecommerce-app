@@ -1,7 +1,7 @@
 
 resource "aws_eks_cluster" "this" {
   name     = "java-ecomm-cluster"
-  role_arn = "arn:aws:iam::<your-account-id>:role/Admin" # Or your IAM role with eks:* permission
+  role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
     subnet_ids = [
