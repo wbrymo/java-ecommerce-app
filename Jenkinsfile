@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/wbrymo/java-ecommerce-app.git'
+                git branch: 'main', url: 'https://github.com/wbrymo/java-ecommerce-app.git'
             }
         }
 
