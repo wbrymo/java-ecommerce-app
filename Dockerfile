@@ -1,9 +1,8 @@
-FROM maven:3.8.5-openjdk-11 AS builder
+FROM maven:3.8.6-openjdk-11
 WORKDIR /app
-COPY . .
+COPY . /app
 RUN mvn clean package -DskipTests
+CMD ["java", "-jar", "target/ecommerce-1.0-SNAPSHOT.jar"]
 
-FROM openjdk:11
-WORKDIR /app
-COPY --from=builder /app/target/ecommerce-1.0-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+
