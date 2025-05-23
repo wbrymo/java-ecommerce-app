@@ -1,27 +1,44 @@
-
 pipeline {
-  agent any
-  stages {
-    stage('Clone') {
-      steps {
-        git 'https://github.com/your-username/ecommerce-backend.git'
-      }
+    agent any
+
+    environment {
+        IMAGE_NAME = "wbrymo/java-ecomm-backend:latest"
     }
-    stage('Build') {
-      steps {
-        sh 'mvn clean package'
-      }
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/wbrymo/java-ecommerce-app.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t $IMAGE_NAME .'
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-login', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push $IMAGE_NAME
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh '''
+                        kubectl rollout restart deployment java-backend
+                    '''
+                }
+            }
+        }
     }
-    stage('Docker Build & Push') {
-      steps {
-        sh 'docker build -t wbrymo/ecommerce:v1 .'
-        sh 'docker push wbrymo/ecommerce:v1'
-      }
-    }
-    stage('Deploy to EKS') {
-      steps {
-        sh 'kubectl apply -f k8s/'
-      }
-    }
-  }
 }
