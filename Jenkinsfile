@@ -15,8 +15,8 @@ pipeline {
 
         stage('Prepare Maven Cache') {
             steps {
-                // Create local Maven cache dir if it doesn't exist
-                sh 'mkdir -p $MAVEN_CACHE'
+                // Ensure the Maven cache directory exists
+                sh 'mkdir -p "$MAVEN_CACHE"'
             }
         }
 
@@ -24,7 +24,10 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker run --rm -v $PWD:/app -v $MAVEN_CACHE:/root/.m2 -w /app maven:3.8.6-openjdk-11 mvn dependency:go-offline
+                        # Pre-fetch Maven dependencies using cache
+                        docker run --rm -v "\$PWD:/app" -v "\$MAVEN_CACHE:/root/.m2" -w /app maven:3.8.6-openjdk-11 mvn dependency:go-offline
+
+                        # Build the Docker image (using the working Dockerfile)
                         docker build -t $IMAGE_NAME .
                     """
                 }
