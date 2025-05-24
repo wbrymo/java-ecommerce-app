@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "wbrymo/java-ecomm-backend:latest"
+        MAVEN_CACHE = "${env.WORKSPACE}/.m2"
     }
 
     stages {
@@ -12,10 +13,20 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Prepare Maven Cache') {
+            steps {
+                // Create local Maven cache dir if it doesn't exist
+                sh 'mkdir -p $MAVEN_CACHE'
+            }
+        }
+
+        stage('Build Docker Image with Maven Cache') {
             steps {
                 script {
-                    sh 'docker build -t $IMAGE_NAME .'
+                    sh """
+                        docker run --rm -v $PWD:/app -v $MAVEN_CACHE:/root/.m2 -w /app maven:3.8.6-openjdk-11 mvn dependency:go-offline
+                        docker build -t $IMAGE_NAME .
+                    """
                 }
             }
         }
@@ -35,10 +46,17 @@ pipeline {
             steps {
                 script {
                     sh '''
-                        kubectl rollout restart deployment java-backend
+                        ssh -o StrictHostKeyChecking=no ec2-user@ip-172-31-80-119 "kubectl rollout restart deployment java-backend"
                     '''
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Build completed. Cleaning up workspace..."
+            cleanWs()
         }
     }
 }
