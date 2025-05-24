@@ -1,0 +1,24 @@
+# Ignore Git and IDE metadata
+.git
+.gitignore
+.idea
+.vscode
+
+# Ignore target directory (Maven build outputs)
+target
+
+# Ignore local configuration files
+*.iml
+*.log
+
+# Ignore Dockerfile itself and docker-compose (if not needed in image)
+Dockerfile
+docker-compose.yml
+
+# Ignore Jenkins pipeline file (if not needed in image)
+Jenkinsfile
+
+# Ignore temp files
+*.swp
+*.swo
+*.tmp
