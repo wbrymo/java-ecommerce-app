@@ -2,33 +2,35 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = "wbrymo/java-ecomm-backend:latest"
+        IMAGE_NAME = 'wbrymo/java-ecomm-backend'
     }
 
     stages {
         stage('Clone Repo') {
             steps {
-                git branch: 'main', url: 'https://github.com/wbrymo/java-ecommerce-app.git'
+                sh '''
+                    rm -rf java-ecommerce-app || echo "Nothing to delete"
+                    git clone https://github.com/wbrymo/java-ecommerce-app.git
+                '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh '''
-                        docker build -t $IMAGE_NAME .
-                    '''
+                dir('java-ecommerce-app') {
+                    script {
+                        def app = docker.build("${IMAGE_NAME}")
+                    }
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-login', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push $IMAGE_NAME
-                    '''
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-login') {
+                        docker.image("${IMAGE_NAME}").push('latest')
+                    }
                 }
             }
         }
@@ -46,7 +48,6 @@ pipeline {
 
     post {
         always {
-            echo "Build completed. Cleaning up workspace..."
             cleanWs()
         }
     }
