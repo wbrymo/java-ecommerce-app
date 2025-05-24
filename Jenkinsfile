@@ -39,7 +39,7 @@ pipeline {
             steps {
                 withCredentials([sshUserPrivateKey(credentialsId: 'k8s-ssh-key', keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no ec2-user@ip-172-31-80-119 "kubectl rollout restart deployment java-backend"
+                        ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no ec2-user@ip-172-31-80-119 "kubectl rollout restart deployment java-backend"
                     '''
                 }
             }
