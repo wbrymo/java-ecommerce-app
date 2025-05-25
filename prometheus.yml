@@ -4,3 +4,6 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+  - job_name: 'java-backend'
+    static_configs:
+     - targets: ['http://a313d4ce355254503a64095bf5ca0c11-887269418.us-east-1.elb.amazonaws.com:8080']
