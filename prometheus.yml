@@ -1,9 +1,41 @@
 global:
   scrape_interval: 15s
+  evaluation_interval: 15s
+
 scrape_configs:
+  # Node Exporter metrics from EC2 A, B, and C
+  - job_name: 'node_exporters'
+    static_configs:
+      - targets:
+          - '172.31.81.190:9100'    # EC2 A private IP
+          - '172.31.80.119:9100'    # EC2 B private IP
+          - '172.31.94.121:9100'    # EC2 C private IP
+
+  # Jenkins metrics on EC2 A (if using Jenkins Prometheus plugin)
+  - job_name: 'jenkins'
+    metrics_path: '/prometheus'
+    static_configs:
+      - targets:
+          - '172.31.81.190:8080'   # Replace with correct Jenkins port/path if needed
+
+  # Kubernetes metrics from EC2 B (Kops cluster, optional)
+  # Note: You'll need to configure kube-state-metrics and necessary API access
+  # - job_name: 'kubernetes'
+  #   kubernetes_sd_configs:
+  #     - role: apiserver
+  #   tls_config:
+  #     insecure_skip_verify: true
+  #   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+  # App metrics from your Load Balancer
+  - job_name: 'app'
+    metrics_path: '/'    # Adjust path if needed (e.g., /metrics)
+    static_configs:
+      - targets:
+          - 'a313d4ce355254503a64095bf5ca0c11-887269418.us-east-1.elb.amazonaws.com'
+
+  # Prometheus itself
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:9090']
-  - job_name: 'java-backend'
-    static_configs:
-     - targets: ['http://a313d4ce355254503a64095bf5ca0c11-887269418.us-east-1.elb.amazonaws.com:8080']
+      - targets:
+          - 'localhost:9090'
