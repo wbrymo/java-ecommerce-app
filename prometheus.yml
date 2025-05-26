@@ -1,22 +1,37 @@
 global:
   scrape_interval: 15s
-  evaluation_interval: 15s
-
 scrape_configs:
-  # Node Exporter metrics from EC2 A, B, and C
-  - job_name: 'node_exporters'
+  - job_name: 'prometheus'
     static_configs:
-      - targets:
-          - '172.31.81.190:9100'    # EC2 A private IP
-          - '172.31.80.119:9100'    # EC2 B private IP
-          - '172.31.94.121:9100'    # EC2 C private IP
+      - targets: ['localhost:9090']
+  - job_name: 'jenkins-java-backend'
+    static_configs:
+     - targets: ['44.202.247.77:9100']
+  - job_name: 'eks-admin'
+    static_configs:
+     - targets: ['44.201.251.55:9100']
+
+~
+
+#global:
+  #scrape_interval: 15s
+  #evaluation_interval: 15s
+
+#scrape_configs:
+  # Node Exporter metrics from EC2 A, B, and C
+ # - job_name: 'node_exporters'
+    #static_configs:
+     # - targets:
+         # - '172.31.81.190:9100'    # EC2 A private IP
+         # - '172.31.80.119:9100'    # EC2 B private IP
+        #  - '172.31.94.121:9100'    # EC2 C private IP
 
   # Jenkins metrics on EC2 A (if using Jenkins Prometheus plugin)
-  - job_name: 'jenkins'
-    metrics_path: '/prometheus'
-    static_configs:
-      - targets:
-          - '172.31.81.190:8080'   # Replace with correct Jenkins port/path if needed
+ # - job_name: 'jenkins'
+  #  metrics_path: '/prometheus'
+  #  static_configs:
+  #    - targets:
+   #       - '172.31.81.190:8080'   # Replace with correct Jenkins port/path if needed
 
   # Kubernetes metrics from EC2 B (Kops cluster, optional)
   # Note: You'll need to configure kube-state-metrics and necessary API access
@@ -28,14 +43,14 @@ scrape_configs:
   #   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
 
   # App metrics from your Load Balancer
-  - job_name: 'app'
-    metrics_path: '/'    # Adjust path if needed (e.g., /metrics)
-    static_configs:
-      - targets:
-          - 'a313d4ce355254503a64095bf5ca0c11-887269418.us-east-1.elb.amazonaws.com'
+ # - job_name: 'app'
+  #  metrics_path: '/'    # Adjust path if needed (e.g., /metrics)
+   # static_configs:
+    #  - targets:
+     #     - 'a313d4ce355254503a64095bf5ca0c11-887269418.us-east-1.elb.amazonaws.com'
 
   # Prometheus itself
-  - job_name: 'prometheus'
-    static_configs:
-      - targets:
-          - 'localhost:9090'
+#  - job_name: 'prometheus'
+#    static_configs:
+#      - targets:
+ #         - 'localhost:9090'
